@@ -17,7 +17,6 @@ app.use(cors()); //todo: update cors when deployed
 app.use(express.json());
 
 //init socket.io
-const socketIoPort = process.env.API_PORT;
 const io = new Server(httpServer, {
   cors: {
     origin: "http://localhost:3000",

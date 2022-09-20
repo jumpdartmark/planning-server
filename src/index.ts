@@ -1,4 +1,5 @@
 import express, { Express, Request, Response } from 'express';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import { createServer } from "http";
 import { Server } from "socket.io";
@@ -11,11 +12,17 @@ dotenv.config();
 const app: Express = express();
 const httpServer = createServer(app);
 const port = process.env.PORT;
+app.use(cors()); //todo: update cors when deployed
 app.use(express.json());
 
 //init socket.io
 const socketIoPort = process.env.API_PORT;
-const io = new Server(httpServer);
+const io = new Server(httpServer, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
+});
 io.on("connection", (socket) => {
   console.log("connection");
   socket.on('join-room', function(room) {

@@ -4,7 +4,8 @@ import dotenv from 'dotenv';
 import { createServer } from "http";
 import { Server } from "socket.io";
 import getApiRouter from "./api";
-import TempDatabase from "./db/TempDatabase"
+import TempDatabase from "./db/TempDatabase";
+import { configureSocketConnection } from "./socketio/socketConfig";
 
 dotenv.config();
 
@@ -24,13 +25,7 @@ const io = new Server(httpServer, {
   }
 });
 io.on("connection", (socket) => {
-  console.log("connection");
-  socket.on('join-room', function(room) {
-    socket.join(room);
-  });
-  socket.on('leave-room', function(room) {
-    socket.leave(room);
-  });  
+  configureSocketConnection(io,socket);  
 });
 
 //init db

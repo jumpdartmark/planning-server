@@ -30,7 +30,7 @@ export interface PokerParticipant{
     name: string;
     isActive: boolean;
     role: PlayerRole;
-    socketId: string;
+    socketId?: string;
 }
 
 export interface PokerSession{
@@ -38,4 +38,9 @@ export interface PokerSession{
     config: PokerSessionConfig;
     items: PokerItem[];
     participants: PokerParticipant[];
+}
+
+export interface PokerPlayerMessage{
+    player: PokerParticipant;
+    payload: any;
 }

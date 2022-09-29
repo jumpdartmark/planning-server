@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 
-import { PokerSession, PokerSessionConfig, PokerItem, PokerVote } from "../types";
+import { PokerSession, PokerSessionConfig, PokerItem, PokerVote, PlanningUser, PokerParticipant, PlayerRole } from "../types";
 
 const getId = (currentIDs: string[]):string => {
     const testId = uuidv4().substring(0,5);
@@ -29,6 +29,7 @@ const mockSession: PokerSession = {
 };
 
 class TempDatabase{
+    #users: PlanningUser[] = [];
     #pokerSessions: PokerSession[];
     constructor(){
         this.#pokerSessions = [mockSession];
@@ -140,6 +141,48 @@ class TempDatabase{
         }
         return item;
     }
+
+    addUserToPokerSession(sessionId:String, user: PlanningUser){
+        const session = this.getPokerSessionById(sessionId);
+        const localUser = this.#users.find((dbUser)=>dbUser.id === user.id);
+        if(!localUser){
+            this.#users.push(user);
+        } else {
+            localUser.name = user.name;
+        }
+        const localSessionUser = session?.participants.find((sessionUser) => sessionUser.id === user.id);
+        if (!localSessionUser){
+            const newPokerPlayer: PokerParticipant = {
+                id: user.id,
+                name: user.name || "unknown",
+                isActive: true,
+                role: PlayerRole.Player,
+            };
+        } else {
+            localSessionUser.isActive = true;
+        }
+    }
+
+    removeUserFromPokerSession(sessionId:String, user: PlanningUser){
+        const session = this.getPokerSessionById(sessionId);
+        const localUser = this.#users.find((dbUser)=>dbUser.id === user.id);
+        if(!localUser){
+            this.#users.push(user);
+        } else {
+            localUser.name = user.name;
+        }
+        const localSessionUser = session?.participants.find((sessionUser) => sessionUser.id === user.id);
+        if (!localSessionUser){
+            const newPokerPlayer: PokerParticipant = {
+                id: user.id,
+                name: user.name || "unknown",
+                isActive: false,
+                role: PlayerRole.Player,
+            };
+        } else {
+            localSessionUser.isActive = false;
+        }
+    }        
 };
 
 export default TempDatabase

@@ -5,7 +5,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import getApiRouter from "./api";
 import TempDatabase from "./db/TempDatabase";
-import { configureSocketConnection } from "./socketio/socketConfig";
+import PlanningSocketManager from "./socketio/PlanningSocketManager";
 
 dotenv.config();
 
@@ -16,6 +16,9 @@ const port = process.env.PORT;
 app.use(cors()); //todo: update cors when deployed
 app.use(express.json());
 
+//init db
+const db = new TempDatabase();
+
 //init socket.io
 const io = new Server(httpServer, {
   cors: {
@@ -23,18 +26,19 @@ const io = new Server(httpServer, {
     methods: ["GET", "POST"]
   }
 });
+
+const socketManager = new PlanningSocketManager(io,db);
+
 io.on("connection", (socket) => {
-  configureSocketConnection(io,socket);  
+  socketManager.configureSocketConnection(socket);
 });
 
-//init db
-const db = new TempDatabase();
 
 //init routes
 app.get('/', (req: Request, res: Response) => {
   res.send('Planning Server');
 });
 
-app.use('/api',getApiRouter(io,db))
+app.use('/api',getApiRouter(socketManager,db))
 
 httpServer.listen(port);

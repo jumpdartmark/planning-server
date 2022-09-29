@@ -1,7 +1,7 @@
 
-import { Server } from "socket.io";
 import express, { Express, Request, Response } from 'express';
 import TempDatabase from "../../db/TempDatabase";
+import PlanningSocketManager from "../../socketio/PlanningSocketManager";
 
 const setResponse = (response:Response, data?:any) => {
     if (data) {
@@ -12,7 +12,7 @@ const setResponse = (response:Response, data?:any) => {
     }
 };
 
-const getRouter = (socketIoServer: Server, database: TempDatabase) => {
+const getRouter = (socketManager: PlanningSocketManager, database: TempDatabase) => {
     const router = express.Router({mergeParams: true});
 
     router.route('/').get((req, res, next) => {
@@ -39,6 +39,7 @@ const getRouter = (socketIoServer: Server, database: TempDatabase) => {
             const seshConfig = req.body;
             const session = database.modifyPokerSession(seshID, seshConfig);
             setResponse(res, session);
+            socketManager.emitPokerSessionUpdate(seshID);
         });
 
     router.route('/sessions/:sessionId/items')
@@ -51,6 +52,7 @@ const getRouter = (socketIoServer: Server, database: TempDatabase) => {
             const seshID = req.params.sessionId;
             const pokerItem = req.body;
             setResponse(res, database.addPokerSessionItem(seshID, pokerItem));
+            socketManager.emitPokerSessionUpdate(seshID);
         }); 
 
     return router;

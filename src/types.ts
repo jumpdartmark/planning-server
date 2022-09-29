@@ -1,5 +1,6 @@
 export interface PlanningUser{
     name?: string;
+    id:string;
 }
 
 export interface PokerVote{
@@ -40,7 +41,7 @@ export interface PokerSession{
     participants: PokerParticipant[];
 }
 
-export interface PokerPlayerMessage{
-    player: PokerParticipant;
+export interface PlanningMessage{
+    user: PlanningUser;
     payload: any;
 }
